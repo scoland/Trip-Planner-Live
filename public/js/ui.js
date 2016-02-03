@@ -15,9 +15,9 @@ function addMarker(location, opts, markerArray) {
 
 $( document ).ready(function() {
 	//adding hotels, restaurants, activities
-	var markerIndexArray = [];
-	var itineraryHTML = {};
 	var emptyDay = $('.itinerary').html();
+	var markerIndexArray = [];
+	var itineraryHTML = [emptyDay];
 	$('.addPanel').on('click', '.pull-right', function(event){
 		var $selected = $(this).prev().find(':selected');
 		var selectedVal = $(this).prev().val();
@@ -63,8 +63,10 @@ $( document ).ready(function() {
 
 	//adding more days
 	$('.day-buttons').on('click', '.add-day', function(event) {
-		var nextNumDay = Number($(this).prev().text()) + 1;
+		var curDayNum = Number($(this).prev().text());
+		var nextNumDay = curDayNum + 1;
 		$(this).before('<button class="btn btn-circle day-btn added-day">' + nextNumDay + '</button>');
+		itineraryHTML.push(emptyDay);
 	});
 
 	//save current day itinerary, then switch day
@@ -72,18 +74,74 @@ $( document ).ready(function() {
 		for (var i = 0; i < markerIndexArray.length; i++) {
 			markerIndexArray[i].setMap(null);
 		}
-		itineraryHTML[$('#day-num').text()] = $('.itinerary').html();
+
+		var curItineraryIndex = Number($('#day-num').text().split(' ')[1]) - 1;
+
+		itineraryHTML[curItineraryIndex] = $('.itinerary').html();
+
+		var otherDayIndex = Number($(this).text()) - 1;
+
 		var dayString = 'Day ' + $(this).text();
 		$('#day-num').text(dayString);
-		if (itineraryHTML[dayString]) {
-			$('.itinerary').html(itineraryHTML[dayString]);
+
+		$('.itinerary').html(itineraryHTML[otherDayIndex]);
+
+		$('.elephant').each(function(index, value) {
+			markerIndexArray[value.dataset.markerindex].setMap(window.map);
+		});
+
+	});
+
+	$('.remove-day').on('click', function(event) {
+		for (var i = 0; i < markerIndexArray.length; i++) {
+			markerIndexArray[i].setMap(null);
+		}
+		if (itineraryHTML.length === 1) {
+			$('.itinerary').html(emptyDay);
+			return;
+		}
+		var curDay = Number($('#day-num').text().split(' ')[1]);
+		var curItineraryIndex = curDay - 1;
+
+		/* If current day is the last day and we are removing the last day*/
+		if (curDay === itineraryHTML.length) {
+			$('.day-btn').each(function (index, value) { //remove that numbered button
+				if (Number($(this).text()) === curDay) {
+					$(this).remove();
+				}
+			});
+			itineraryHTML.pop();
+			$('#day-num').text('Day ' + curItineraryIndex);
+			$('.itinerary').html(itineraryHTML[itineraryHTML.length - 1]);
 			$('.elephant').each(function(index, value) {
 				markerIndexArray[value.dataset.markerindex].setMap(window.map);
 			});
 
-		} else {
-			$('.itinerary').html(emptyDay);
+		} else {  //if removing not the last day
+
+			// Deal with the buttons
+			$('.day-btn').each(function (index, value) {
+				if (Number($(this).text()) === curDay) {
+					$(this).remove();
+					// $('.elephant').each(function(index, value) {
+					// 	markerIndexArray[value.dataset.markerindex].setMap(window.map);
+					// });
+				}
+				else { //change all buttons after current day which is being removed
+					if (Number($('#day-num').text().split(' ')[1]) < (Number($(this).text()))) { //all buttons numbered greater than the one being removed
+						$(this).text(Number($(this).text() - 1));
+					}
+				}
+			});
+
+			// Remove the day form the itineraryHTML array
+			itineraryHTML.splice(curItineraryIndex,1);
+			$('.itinerary').html(itineraryHTML[curItineraryIndex]);
+			$('.elephant').each(function(index, value) {
+				markerIndexArray[value.dataset.markerindex].setMap(window.map);
+			});
 		}
+		
 	});
 	
 
