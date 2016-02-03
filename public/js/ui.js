@@ -22,7 +22,7 @@ $( document ).ready(function() {
 		var $selected = $(this).prev().find(':selected');
 		var selectedVal = $(this).prev().val();
 		var markerIndex = markerIndexArray.length;
-		var htmlStr = "<div class='itinerary-item'><span class='title'>" + selectedVal + "</span><button class='btn btn-xs btn-danger remove btn-circle' data-marker-index='" + markerIndex + "'>x</button></div>";
+		var htmlStr = "<div class='itinerary-item'><span class='title'>" + selectedVal + "</span><button class='btn btn-xs btn-danger remove btn-circle elephant' data-markerindex='" + markerIndex + "'>x</button></div>";
 
 		var iconPath;
 		var location;
@@ -57,7 +57,7 @@ $( document ).ready(function() {
 	//removing hotels, restaurants, activities
 	$('.itinerary').on('click', '.btn-danger', function(event) {
 		$(this).parent().remove();
-		var iconToRemove = $(this).data('marker-index');
+		var iconToRemove = $(this).data('markerindex');
 		markerIndexArray[iconToRemove].setMap(null);
 	});
 
@@ -69,11 +69,18 @@ $( document ).ready(function() {
 
 	//save current day itinerary, then switch day
 	$('.day-buttons').on('click', '.day-btn', function(event) {
+		for (var i = 0; i < markerIndexArray.length; i++) {
+			markerIndexArray[i].setMap(null);
+		}
 		itineraryHTML[$('#day-num').text()] = $('.itinerary').html();
 		var dayString = 'Day ' + $(this).text();
 		$('#day-num').text(dayString);
 		if (itineraryHTML[dayString]) {
 			$('.itinerary').html(itineraryHTML[dayString]);
+			$('.elephant').each(function(index, value) {
+				markerIndexArray[value.dataset.markerindex].setMap(window.map);
+			});
+
 		} else {
 			$('.itinerary').html(emptyDay);
 		}
