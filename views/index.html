@@ -1,0 +1,99 @@
+{% extends 'layout.html' %}
+
+{% block title %}Your Trip{% endblock %}
+
+{% block content %}
+<div id="app" class="clearfix">
+  <div class="map-container col-sm-8 col-lg-9">
+    <div>
+      <div id="map-canvas"></div>
+    </div>
+  </div>
+  <div id="control-panel" class="col-sm-4 col-lg-3 clearfix">
+    <div class="col-xs-6 col-sm-12">
+      <div class="panel panel-default">
+        <div class="panel-body addPanel">
+          <div>
+            <h4>Hotels</h4>
+            <select>
+              {% for hotel in all_hotels %}
+                <option data-lat="{{hotel.place[0].location[0]}}" data-long="{{hotel.place[0].location[1]}}">{{ hotel.name }}</option>
+              {% endfor %}
+            </select>
+            <button class="btn btn-primary btn-circle pull-right plusHotel">+</button>
+          </div>
+          <div>
+            <h4>Restaurants</h4>
+            <select>
+              {% for restaurant in all_restaurants %}
+                <option data-lat="{{restaurant.place[0].location[0]}}" data-long="{{restaurant.place[0].location[1]}}">{{ restaurant.name }}</option>
+              {% endfor %}
+            </select>
+            <button class="btn btn-primary btn-circle pull-right plusRestaurant">+</button>
+          </div>
+          <div>
+            <h4>Activities</h4>
+            <select>
+              {% for activity in all_activities %}
+              <option data-lat="{{activity.place[0].location[0]}}" data-long="{{activity.place[0].location[1]}}">{{ activity.name }}</option>
+              {% endfor %}
+            </select>
+            <button class="btn btn-primary btn-circle pull-right plusActivity">+</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xs-6 col-sm-12">
+      <h3>
+        <span id="day-title">
+          <span id="day-num">Day 1</span>
+          <button class="btn btn-xs btn-danger remove btn-circle">x</button>
+        </span>
+      </h3>
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <div class="day-buttons">
+            <button class="btn btn-circle day-btn">1</button>
+<!--             <button class="btn btn-circle day-btn current-day">2</button>
+            <button class="btn btn-circle day-btn">3</button> -->
+            <button class="btn btn-circle add-day">+</button>
+          </div>
+        </div>
+        <div class="panel-body itinerary">
+          <div>
+            <h4>My Hotel</h4>
+            <ul class="list-group hotelList">
+              <!-- Hotels go here -->
+            </ul>
+          </div>
+          <div>
+            <h4>My Restaurants</h4>
+            <ul class="list-group restaurantList">
+              <!-- Restaurants go here -->
+
+            </ul>
+          </div>
+          <div>
+            <h4>My Activities</h4>
+            <ul class="list-group activityList">
+              <!-- Activities go here -->
+
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+  <script>
+    {% autoescape false %}
+      // note to instructors: next iteration, change `all_xyz` to `templateXyz`
+      var hotels = {{ all_hotels | json }};
+      var restaurants = {{ all_restaurants | json }};
+      var activities = {{ all_activities | json }};
+    {% endautoescape %}
+  </script>
+{% endblock %}
